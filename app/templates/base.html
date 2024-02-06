@@ -96,6 +96,19 @@
 				color: white;
 			}*/
 
+            .content {
+                margin-left: 20%;
+                padding: 20px;
+            }
+
+            .sidebar {
+                height: 100%;
+                width: 25%;
+                position: fixed;
+                left: 0;
+                padding: 20px;
+            }
+
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -140,7 +153,35 @@
             </a>
         </div>
     </nav>
+</div>
+<div class="sidebar d-flex align-items-start">
+    <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+        <button class="nav-link" id="v-pills-home-tab" data-bs-toggle="pill" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="false">GRIMMARD</button>
+        <br>
+        <button class="nav-link" id="v-pills-profile-tab" data-bs-toggle="pill" data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false" disabled>GRMA</button>
+        <br>
+        <button class="nav-link" id="v-pills-disabled-tab" data-bs-toggle="pill" data-bs-target="#v-pills-disabled" type="button" role="tab" aria-controls="v-pills-disabled" aria-selected="false">GRAMM</button>
+        <br>
+        <button class="nav-link" id="v-pills-messages-tab" data-bs-toggle="pill" data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false" disabled>EFS</button>
+        <br>
+        <button class="nav-link active" id="v-pills-settings-tab" data-bs-toggle="pill" data-bs-target="#v-pills-settings" type="button" role="tab" aria-controls="v-pills-settings" aria-selected="true">HWE</button>
+        <br>
+        <button class="nav-link" id="v-pills-cpra-tab" data-bs-toggle="pill" data-bs-target="#v-pills-cpra" type="button" role="tab" aria-controls="v-pills-cpra" aria-selected="false">CPRA</button>
+        <br>
+        <button class="nav-link" id="v-pills-cal-tab" data-bs-toggle="pill" data-bs-target="#v-pills-cal" type="button" role="tab" aria-controls="v-pills-cal" aria-selected="false">CALIBER</button>
+    </div>
+        <div class="tab-content" id="v-pills-tabContent">
+            <div class="tab-pane fade" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab" tabindex="0"><a href="https://grimmard.math.biu.ac.il/">HLA Imputation</a></div>
+            <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab" tabindex="0"><a href="">Graph based HLA Matching donor detection</a></div>
+            <div class="tab-pane fade" id="v-pills-disabled" role="tabpanel" aria-labelledby="v-pills-disabled-tab" tabindex="0"><a href="https://gramm.math.biu.ac.il/">HLA Family Imputation</a></div>
+            <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab" tabindex="0"><a href="">Transplant outcome prediction Estimate of deviation from Hardy</a></div>
+            <div class="tab-pane fade show active" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab" tabindex="0"><a href="Home">Weingerg Equiblirium</a></div>
+            <div class="tab-pane fade" id="v-pills-cpra" role="tabpanel" aria-labelledby="v-pills-cpra-tab" tabindex="0"><a href="https://cpra.math.biu.ac.il/Home">Calculated PRA</a></div>
+            <div class="tab-pane fade" id="v-pills-cal" role="tabpanel" aria-labelledby="v-pills-cal-tab" tabindex="0"><a href="https://caliber.math.biu.ac.il/">B cell epitope prediction</a></div>
+    </div>
+</div>
 
+<div class="content">
     {% block header %}{% endblock %}
 
     {% block content %}{% endblock %}
