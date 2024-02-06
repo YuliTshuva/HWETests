@@ -4,9 +4,10 @@ import os
 from flask import Flask, request, render_template
 import traceback
 import pandas as pd
+import threading
 import time
 from hwetests import asta, umat, umat_with_uncertainty
-
+import numpy as np
 
 # create an instance of the Flask class, with the name of the running application and the paths for the static files and templates
 app = Flask(__name__, static_folder='static', template_folder="templates")
@@ -21,35 +22,43 @@ app.config["PERMANENT_SESSION_LIFETIME"] = datetime.timedelta(hours=1)
 app.config["SECRET_KEY"] = secrets.token_hex()
 
 
+def clean_old_files():
+    files = os.listdir("static")
+    good_files = ["bootstrap", 'ambiguous_data.csv', 'index.css', 'LabQR.jpg',
+                  'results.css', 'unambiguous_data.csv', 'yolo_lab.jpg']
+    files = list(set(files) - set(good_files))
+    for file in files:
+        file_time = ""
+        i = 0
+        ch = file[i]
+        while ch.isdigit():
+            file_time += ch
+            i += 1
+            ch = file[i]
+
+        # Time is older than an hour
+        if time.time() - float(file_time) > 3600:
+            os.remove(os.path.join("static", file))
+
+
 @app.route('/impute-form', methods=['POST'])
 def impute_form():
     try:
         current_time = time.time()
         temp_save_path = f"static/{current_time}.csv"
-        matrix = request.files['matrix-file']
+        matrix = request.files['observations']
         matrix.save(temp_save_path)
-        df = pd.read_csv(temp_save_path)
+        matrix = np.genfromtxt(temp_save_path, delimiter=',')
         os.remove(temp_save_path)
 
-        if df.shape[0] != df.shape[1]:
-            return render_template("error.html", active="", error="The matrix dimensions are not matching.")
-
-        for column in df.columns:
-            if df[column].dtype not in [float, int]:
-                return render_template("error.html", active="",
-                                       error=f"Matrix datatype should be float or int.\nYou have "
-                                             f"{df[column].dtype} datatype in column {column}.")
-
-        matrix = df.to_numpy()
-
-        pval = umat.full_algorithm(matrix)
-        plot_path = "umat_plot.png"
+        plot_path = f"static/{current_time}.png"
+        pval = umat.full_algorithm(matrix, plot_path)
 
         return render_template("results_second_edition.html", active="results",
-                               pic_path=plot_path, pval=pval, dof=False, statistic=False, csv_path=False)
+                               plot_path=plot_path, pval=pval, dof=False, statistic=False, csv_path=False)
 
 
-    #render an error template if an exception occurs
+    # render an error template if an exception occurs
     except Exception as e:
         traceback.print_exc()
         return render_template("error.html", active="", error=str(e))
@@ -62,21 +71,20 @@ def impute_form_2():
         current_time = time.time()
         temp_save_path = f"static/{current_time}"
         matrix = request.files['csv-file']
-        matrix.save(temp_save_path+".csv")
+        matrix.save(temp_save_path + ".csv")
 
         ## Apply Or's function
-        plot_path = temp_save_path + "plot"
+        plot_path = temp_save_path + "plot.png"
         csv_path = temp_save_path + "output_file"
-        pval, statistic, dof = asta.full_algorithm(temp_save_path+".csv", should_save_plot=plot_path,
+        pval, statistic, dof = asta.full_algorithm(temp_save_path + ".csv", should_save_plot=plot_path,
                                                    should_save_csv=csv_path, cutoff_value=2.0)
-        os.remove(temp_save_path+".csv")
-        plot_path += ".png"
+        os.remove(temp_save_path + ".csv")
         csv_path += ".csv"
 
         return render_template("results_second_edition.html", active="results", plot_path=plot_path,
                                pval=pval, dof=dof, statistic=statistic, csv_path=csv_path)
 
-    #render an error template if an exception occurs
+    # render an error template if an exception occurs
     except Exception as e:
         traceback.print_exc()
         return render_template("error.html", active="", error=str(e))
@@ -89,13 +97,6 @@ def impute_form_3():
         temp_save_path = f"static/{current_time}.csv"
         matrix = request.files['csv-file']
         matrix.save(temp_save_path)
-        df = pd.read_csv(temp_save_path)
-
-        for column in df.columns:
-            if df[column].dtype not in [float, int]:
-                return render_template("error.html", active="",
-                                       error=f"Matrix datatype should be float or int.\nYou have "
-                                             f"{df[column].dtype} datatype in column {column}.")
 
         pval = umat_with_uncertainty.full_algorithm(temp_save_path)
         os.remove(temp_save_path)
@@ -111,6 +112,8 @@ def impute_form_3():
 @app.route('/', methods=['GET'])
 @app.route('/Home', methods=['GET'])
 def home():
+    thread = threading.Thread(target=clean_old_files)
+    thread.start()
     return render_template("index.html", active="Home")
 
 
